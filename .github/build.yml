@@ -1,0 +1,23 @@
+name: helm-template-testing
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+      - develop
+      - feature/*
+  pull_request:
+    branches:
+      - main
+      - develop
+      - feature/*
+jobs:
+  Pull:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Fetch nginx helm chart
+      run: |
+        helm repo add bitnami https://charts.bitnami.com/bitnami
+        helm install my-release bitnami/nginx
