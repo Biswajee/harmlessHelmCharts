@@ -1,19 +1,21 @@
 name: helm-template-testing
+
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
+  # Trigger the workflow on push or pull request for below branches
   push:
     branches:
       - main
       - develop
       - feature/*
+
   pull_request:
     branches:
       - main
       - develop
       - feature/*
+
 jobs:
-  BUILD:
+  BUILD-TEST:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -32,15 +34,14 @@ jobs:
       run: |
         helm repo add itzg https://itzg.github.io/minecraft-server-charts/
         helm pull itzg/minecraft --untar --untardir charts
-    
+
     - name: Generate helm template for minecraft charts
       run: helm template charts/minecraft > helm-template-result/deployment.yaml
 
-  TEST:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install conftest plugin for helm
-        run: helm plugin install https://github.com/instrumenta/helm-conftest
+    - name: Install conftest
+      run: |
+        brew tap instrumenta/instrumenta
+        brew install conftest
 
-      - name: Execute conftest test on helm template output
-        run: helm conftest helm-template-result --policy kubernetes --output table
+    - name: Evaluate deployment using policies
+      run: conftest test helm-template-result --policy kubernetes --output table --all-namespaces
