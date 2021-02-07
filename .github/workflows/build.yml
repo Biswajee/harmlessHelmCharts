@@ -13,11 +13,29 @@ on:
       - develop
       - feature/*
 jobs:
-  Pull:
+  BUILD:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Fetch nginx helm chart
+
+    # pull in policy from conftest repo
+    - uses: actions/checkout@master
+      with:
+        repository: 'open-policy-agent/library'
+        ref: 'master'
+        path: 'kubernetes'
+
+    - name: Create results directory
+      run: mkdir helm-template-result
+
+    - name: Fetch minecraft helm chart
       run: |
-        helm repo add bitnami https://charts.bitnami.com/bitnami
-        helm install my-release bitnami/nginx
+        helm repo add itzg https://itzg.github.io/minecraft-server-charts/
+        helm pull itzg/minecraft --untar --untardir charts
+    
+    - name: Generate helm template for minecraft charts
+      run: helm template charts/minecraft > helm-template-result/deployment.yaml
+
+
+
+    
