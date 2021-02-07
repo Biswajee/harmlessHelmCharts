@@ -36,6 +36,11 @@ jobs:
     - name: Generate helm template for minecraft charts
       run: helm template charts/minecraft > helm-template-result/deployment.yaml
 
+  TEST:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install conftest plugin for helm
+        run: helm plugin install https://github.com/instrumenta/helm-conftest
 
-
-    
+      - name: Execute conftest test on helm template output
+        run: helm conftest helm-template-result --policy kubernetes --output table
