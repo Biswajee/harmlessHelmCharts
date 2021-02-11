@@ -36,7 +36,7 @@ jobs:
         helm pull itzg/minecraft --untar --untardir charts
 
     - name: Generate helm template for minecraft charts
-      run: helm template charts/minecraft > helm-template-result/deployment.yaml
+      run: helm template charts/minecraft --output-dir helm-template-result
 
     - name: Install conftest
       run: |
